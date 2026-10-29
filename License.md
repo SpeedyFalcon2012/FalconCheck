@@ -1,3 +1,2 @@
-Copyright (c) 2026 SpeedyFalcon2012. All rights reserved.
 You may download and use this software for personal, non-commercial purposes.
-You may NOT modify, redistribute, sublicense, or sell this software or any derivative works without prior written permission from the author.
+You may NOT sell any modified version of this software without my permission, and I would appreciate it if you told me if you are redistributing any version of this software.
